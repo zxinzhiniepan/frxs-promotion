@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>promotion</artifactId>
+        <groupId>com.frxs.promotion</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>promotion-common-integration</artifactId>
+    <version>${module.version}</version>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.frxs.framework</groupId>
+            <artifactId>frxsframework-integration</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.curator</groupId>
+                    <artifactId>curator-framework</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.frxs.promotion</groupId>
+            <artifactId>promotion-common-util</artifactId>
+            <version>${module.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.4.01</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.frxs.merchant</groupId>
+            <artifactId>merchant-service-api</artifactId>
+            <version>${frxs.merchant.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.frxs.trade</groupId>
+            <artifactId>trade-service-api</artifactId>
+            <version>${frxs.trade.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.frxs.user</groupId>
+            <artifactId>user-service-api</artifactId>
+            <version>${frxs.user.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

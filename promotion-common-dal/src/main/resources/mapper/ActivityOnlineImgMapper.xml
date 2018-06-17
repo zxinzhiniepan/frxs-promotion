@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ frxs Inc.  兴盛社区网络服务股份有限公司.
+  ~ Copyright (c) 2017-2018. All Rights Reserved.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frxs.promotion.common.dal.mapper.ActivityOnlineImgMapper">
+  <resultMap id="BaseResultMap" type="com.frxs.promotion.common.dal.entity.ActivityOnlineImg">
+    <id column="imgId" jdbcType="BIGINT" property="imgId" />
+    <result column="imgtextId" jdbcType="BIGINT" property="imgtextId" />
+    <result column="textId" jdbcType="BIGINT" property="textId" />
+    <result column="originalImgUrl" jdbcType="VARCHAR" property="originalImgUrl" />
+    <result column="imgUrl60" jdbcType="VARCHAR" property="imgUrl60" />
+    <result column="imgUrl120" jdbcType="VARCHAR" property="imgUrl120" />
+    <result column="imgUrl200" jdbcType="VARCHAR" property="imgUrl200" />
+    <result column="imgUrl400" jdbcType="VARCHAR" property="imgUrl400" />
+    <result column="imgStatus" jdbcType="VARCHAR" property="imgStatus" />
+    <result column="createUserId" jdbcType="BIGINT" property="createUserId" />
+    <result column="createUserName" jdbcType="VARCHAR" property="createUserName" />
+    <result column="modifyUserId" jdbcType="BIGINT" property="modifyUserId" />
+    <result column="modifyUserName" jdbcType="VARCHAR" property="modifyUserName" />
+    <result column="tmCreate" jdbcType="TIMESTAMP" property="tmCreate" />
+    <result column="tmSmp" jdbcType="TIMESTAMP" property="tmSmp" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    imgId,imgtextId, textId, originalImgUrl, imgUrl60, imgUrl120, imgUrl200, imgUrl400, imgStatus,
+    createUserId, createUserName, modifyUserId, modifyUserName, tmCreate, tmSmp
+  </sql>
+
+  <select id="selectByTextId" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/> from t_activity_online_img where textId = #{textId} and imgStatus != 'REJECT'
+  </select>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.frxs.promotion.common.dal.entity.ActivityOnlineImg">
+    update t_activity_online_img
+    <set>
+      <if test="textId != null">
+        textId = #{textId,jdbcType=BIGINT},
+      </if>
+      <if test="originalImgUrl != null">
+        originalImgUrl = #{originalImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="imgUrl60 != null">
+        imgUrl60 = #{imgUrl60,jdbcType=VARCHAR},
+      </if>
+      <if test="imgUrl120 != null">
+        imgUrl120 = #{imgUrl120,jdbcType=VARCHAR},
+      </if>
+      <if test="imgUrl200 != null">
+        imgUrl200 = #{imgUrl200,jdbcType=VARCHAR},
+      </if>
+      <if test="imgUrl400 != null">
+        imgUrl400 = #{imgUrl400,jdbcType=VARCHAR},
+      </if>
+      <if test="imgStatus != null">
+        imgStatus = #{imgStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="createUserId != null">
+        createUserId = #{createUserId,jdbcType=BIGINT},
+      </if>
+      <if test="createUserName != null">
+        createUserName = #{createUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyUserId != null">
+        modifyUserId = #{modifyUserId,jdbcType=BIGINT},
+      </if>
+      <if test="modifyUserName != null">
+        modifyUserName = #{modifyUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="tmCreate != null">
+        tmCreate = #{tmCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tmSmp != null">
+        tmSmp = #{tmSmp,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where imgId = #{imgId,jdbcType=BIGINT}
+  </update>
+</mapper>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ frxs Inc.  兴盛社区网络服务股份有限公司.
+  ~ Copyright (c) 2017-2018. All Rights Reserved.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frxs.promotion.common.dal.mapper.SmsMapper">
+  <resultMap id="BaseResultMap" type="com.frxs.promotion.common.dal.entity.Sms">
+    <id column="smsId" jdbcType="BIGINT" property="smsId" />
+    <result column="phoneNum" jdbcType="VARCHAR" property="phoneNum" />
+    <result column="smsType" jdbcType="VARCHAR" property="smsType" />
+    <result column="verificationCode" jdbcType="VARCHAR" property="verificationCode" />
+    <result column="smsStatus" jdbcType="VARCHAR" property="smsStatus" />
+    <result column="tmSend" jdbcType="TIMESTAMP" property="tmSend" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="areaId" jdbcType="BIGINT" property="areaId" />
+    <result column="ip" jdbcType="VARCHAR" property="ip" />
+    <result column="tmCreate" jdbcType="TIMESTAMP" property="tmCreate" />
+    <result column="tmSmp" jdbcType="TIMESTAMP" property="tmSmp" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    smsId, phoneNum, smsType, verificationCode, smsStatus, tmSend, content, areaId, ip, 
+    tmCreate, tmSmp
+  </sql>
+
+  <select id="findSmsByConditions" parameterType="Map" resultType="com.frxs.promotion.common.dal.entity.Sms">
+    select
+    smsId, phoneNum, smsType, verificationCode, smsStatus, tmSend, content, areaId, ip,
+    tmCreate, tmSmp
+    from t_sms
+    <include refid="smsWhere"/>
+    ORDER BY tmSend DESC
+    LIMIT #{pageNo},#{pageSize}
+  </select>
+
+  <select id="countSmsList" parameterType="java.util.Map" resultType="java.lang.Integer">
+    SELECT COUNT(1) FROM t_sms a
+    <include refid="smsWhere"/>
+  </select>
+
+  <select id="smsFrequency" parameterType="Map" resultType="com.frxs.promotion.common.dal.entity.Sms">
+    select
+    smsId, phoneNum, smsType, verificationCode, smsStatus, tmSend, content, areaId, ip,
+    tmCreate, tmSmp
+    from t_sms
+    WHERE tmSend>DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+    <if test="phoneNum != null and phoneNum != '' ">
+      AND phoneNum = #{phoneNum}
+    </if>
+    ORDER BY tmSend DESC
+  </select>
+
+  <sql id="smsWhere">
+    WHERE 1 = 1
+    <if test="phoneNum != null and phoneNum != '' ">
+      AND phoneNum LIKE concat(concat('%',#{phoneNum}),'%')
+    </if>
+    <if test="startSendTime != null">
+      AND  tmSend &gt; #{startSendTime,jdbcType=TIMESTAMP}
+    </if>
+    <if test="endSendTime != null ">
+      AND  tmSend &lt; #{endSendTime,jdbcType=TIMESTAMP}
+    </if>
+    <if test="smsType != null and smsType != '' ">
+      AND smsType = #{smsType}
+    </if>
+    <if test="smsStatus != null and smsStatus != '' ">
+      AND smsStatus = #{smsStatus}
+    </if>
+    <if test="areaId != null and areaId != '' ">
+      AND areaId = #{areaId,jdbcType=BIGINT}
+    </if>
+  </sql>
+
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.frxs.promotion.common.dal.entity.Sms">
+    update t_sms
+    <set>
+      <if test="phoneNum != null">
+        phoneNum = #{phoneNum,jdbcType=VARCHAR},
+      </if>
+      <if test="smsType != null">
+        smsType = #{smsType,jdbcType=VARCHAR},
+      </if>
+      <if test="verificationCode != null">
+        verificationCode = #{verificationCode,jdbcType=VARCHAR},
+      </if>
+      <if test="smsStatus != null">
+        smsStatus = #{smsStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="tmSend != null">
+        tmSend = #{tmSend,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="areaId != null">
+        areaId = #{areaId,jdbcType=BIGINT},
+      </if>
+      <if test="ip != null">
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="tmCreate != null">
+        tmCreate = #{tmCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tmSmp != null">
+        tmSmp = #{tmSmp,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where smsId = #{smsId,jdbcType=BIGINT}
+  </update>
+</mapper>

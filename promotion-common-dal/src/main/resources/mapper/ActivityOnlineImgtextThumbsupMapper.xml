@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frxs.promotion.common.dal.mapper.ActivityOnlineImgtextThumbsupMapper">
+  <resultMap id="BaseResultMap" type="com.frxs.promotion.common.dal.entity.ActivityOnlineImgtextThumbsup">
+    <id column="thumbsupId" jdbcType="BIGINT" property="thumbsupId"/>
+    <result column="textId" jdbcType="BIGINT" property="textId"/>
+    <result column="userId" jdbcType="BIGINT" property="userId"/>
+    <result column="userAvatar" jdbcType="VARCHAR" property="userAvatar"/>
+    <result column="wxName" jdbcType="VARCHAR" property="wxName"/>
+    <result column="tmThumbsup" jdbcType="TIMESTAMP" property="tmThumbsup"/>
+    <result column="tmCreate" jdbcType="TIMESTAMP" property="tmCreate"/>
+    <result column="tmSmp" jdbcType="TIMESTAMP" property="tmSmp"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    thumbsupId, textId, userId, userAvatar,wxName,tmThumbsup, tmCreate, tmSmp
+  </sql>
+
+  <insert id="insertBatch" parameterType="java.util.List">
+    INSERT INTO t_activity_online_imgtext_thumbsup(
+    textId, userId, userAvatar,wxName,tmThumbsup, tmCreate
+    )VALUES
+    <foreach collection="list" item="item" separator=",">
+      (
+      #{item.textId}, #{item.userId}, #{item.userAvatar},#{item.wxName},#{item.tmThumbsup}, #{item.tmCreate}
+      )
+    </foreach>
+  </insert>
+</mapper>

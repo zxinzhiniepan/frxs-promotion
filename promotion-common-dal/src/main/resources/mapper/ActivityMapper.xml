@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ frxs Inc.  兴盛社区网络服务股份有限公司.
+  ~ Copyright (c) 2017-2018. All Rights Reserved.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frxs.promotion.common.dal.mapper.ActivityMapper">
+  <resultMap id="BaseResultMap" type="com.frxs.promotion.common.dal.entity.Activity">
+    <id column="activityId" jdbcType="BIGINT" property="activityId"/>
+    <result column="areaId" jdbcType="BIGINT" property="areaId"/>
+    <result column="activityName" jdbcType="VARCHAR" property="activityName"/>
+    <result column="activityType" jdbcType="VARCHAR" property="activityType"/>
+    <result column="tmBuyStart" jdbcType="TIMESTAMP" property="tmBuyStart"/>
+    <result column="tmBuyEnd" jdbcType="TIMESTAMP" property="tmBuyEnd"/>
+    <result column="tmDisplayStart" jdbcType="TIMESTAMP" property="tmDisplayStart"/>
+    <result column="tmDisplayEnd" jdbcType="TIMESTAMP" property="tmDisplayEnd"/>
+    <result column="tmPickUp" jdbcType="TIMESTAMP" property="tmPickUp"/>
+    <result column="status" jdbcType="VARCHAR" property="status"/>
+    <result column="auditUserId" jdbcType="BIGINT" property="auditUserId"/>
+    <result column="auditUserName" jdbcType="VARCHAR" property="auditUserName"/>
+    <result column="tmAudit" jdbcType="TIMESTAMP" property="tmAudit"/>
+    <result column="createUserId" jdbcType="BIGINT" property="createUserId"/>
+    <result column="createUserName" jdbcType="VARCHAR" property="createUserName"/>
+    <result column="modifyUserId" jdbcType="BIGINT" property="modifyUserId"/>
+    <result column="modifyUserName" jdbcType="VARCHAR" property="modifyUserName"/>
+    <result column="tmCreate" jdbcType="TIMESTAMP" property="tmCreate"/>
+    <result column="tmSmp" jdbcType="TIMESTAMP" property="tmSmp"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    activityId, areaId, activityName, activityType, tmBuyStart, tmBuyEnd, tmDisplayStart, 
+    tmDisplayEnd, tmPickUp, status, auditUserId, auditUserName, tmAudit, createUserId, 
+    createUserName, modifyUserId, modifyUserName, tmCreate, tmSmp
+  </sql>
+
+  <select id="selectByActivityId" parameterType="Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from t_activity
+    <choose>
+      <when test="activityIdList == null or activityIdList.size() == 0">
+        WHERE 1 != 1
+      </when>
+      <when test="activityIdList.size() == 1">
+        WHERE `activityId` =
+        <foreach collection="activityIdList" item="id">#{id,jdbcType=BIGINT}</foreach>
+      </when>
+      <otherwise>
+        WHERE `activityId` in
+        <foreach collection="activityIdList" item="id" open="(" separator="," close=")">
+          #{id,jdbcType=BIGINT}
+        </foreach>
+      </otherwise>
+    </choose>
+    <if test="areaId != null and areaId != '' ">
+      AND areaId = #{areaId,jdbcType=BIGINT}
+    </if>
+  </select>
+
+  <update id="batchDelActivity" parameterType="Map" statementType="PREPARED">
+    UPDATE t_activity SET
+    status = 'DELETED',
+    modifyUserId = #{operateId,jdbcType=BIGINT},
+    modifyUserName = #{operateName,jdbcType=BIGINT}
+    <choose>
+      <when test="activityIdList == null or activityIdList.size() == 0">
+        WHERE 1 != 1
+      </when>
+      <when test="activityIdList.size() == 1">
+        WHERE `activityId` =
+        <foreach collection="activityIdList" item="id">#{id,jdbcType=BIGINT}</foreach>
+      </when>
+      <otherwise>
+        WHERE `activityId` in
+        <foreach collection="activityIdList" item="id" open="(" separator="," close=")">
+          #{id,jdbcType=BIGINT}
+        </foreach>
+      </otherwise>
+    </choose>
+    <if test="areaId != null and areaId != '' ">
+      AND areaId = #{areaId,jdbcType=BIGINT}
+    </if>
+  </update>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.frxs.promotion.common.dal.entity.Activity">
+    update t_activity
+    <set>
+      <if test="areaId != null">
+        areaId = #{areaId,jdbcType=BIGINT},
+      </if>
+      <if test="activityName != null">
+        activityName = #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="activityType != null">
+        activityType = #{activityType,jdbcType=VARCHAR},
+      </if>
+      <if test="tmBuyStart != null">
+        tmBuyStart = #{tmBuyStart,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tmBuyEnd != null">
+        tmBuyEnd = #{tmBuyEnd,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tmDisplayStart != null">
+        tmDisplayStart = #{tmDisplayStart,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tmDisplayEnd != null">
+        tmDisplayEnd = #{tmDisplayEnd,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tmPickUp != null">
+        tmPickUp = #{tmPickUp,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="auditUserId != null">
+        auditUserId = #{auditUserId,jdbcType=BIGINT},
+      </if>
+      <if test="auditUserName != null">
+        auditUserName = #{auditUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="tmAudit != null">
+        tmAudit = #{tmAudit,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUserId != null">
+        createUserId = #{createUserId,jdbcType=BIGINT},
+      </if>
+      <if test="createUserName != null">
+        createUserName = #{createUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyUserId != null">
+        modifyUserId = #{modifyUserId,jdbcType=BIGINT},
+      </if>
+      <if test="modifyUserName != null">
+        modifyUserName = #{modifyUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="tmCreate != null">
+        tmCreate = #{tmCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tmSmp != null">
+        tmSmp = #{tmSmp,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where activityId = #{activityId,jdbcType=BIGINT}
+  </update>
+
+  <select id="countActivity" parameterType="java.util.Map" resultType="java.lang.Integer">
+    SELECT COUNT(1) FROM t_activity a
+    <include refid="ActivityWhere"/>
+  </select>
+
+  <select id="selectActivityPage" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM t_activity a
+    <include refid="ActivityWhere"/>
+    ORDER BY a.tmSmp DESC
+    LIMIT #{offset},#{limit}
+  </select>
+
+  <sql id="ActivityWhere">
+    <where>
+      a.status != 'DELETED'
+      <if test="query.areaId != null">
+        AND a.areaId = #{query.areaId}
+      </if>
+      <if test="query.activityName != null and query.activityName != ''">
+        AND a.activityName LIKE concat('%',#{query.activityName},'%')
+      </if>
+      <if test="query.tmBuyStart != null and query.tmBuyEnd == null">
+        AND (
+        (#{query.tmBuyStart} &lt;= a.tmBuyStart)
+        OR (#{query.tmBuyStart} BETWEEN a.tmBuyStart AND a.tmBuyEnd)
+        )
+      </if>
+      <if test="query.tmBuyEnd != null and query.tmBuyStart == null">
+        AND (
+        (a.tmBuyEnd &lt;= #{query.tmBuyEnd})
+        OR (#{query.tmBuyEnd} BETWEEN a.tmBuyStart AND a.tmBuyEnd)
+        )
+      </if>
+      <if test="query.tmBuyStart != null and query.tmBuyEnd != null">
+        AND (
+        (#{query.tmBuyStart} BETWEEN a.tmBuyStart AND a.tmBuyEnd)
+        OR (a.tmBuyStart >= #{query.tmBuyStart} AND a.tmBuyEnd &lt;= #{query.tmBuyEnd})
+        OR (#{query.tmBuyEnd} BETWEEN a.tmBuyStart AND a.tmBuyEnd)
+        )
+      </if>
+      <if test="query.actvityStatus == 'NOTSTARTED'">
+        AND a.tmBuyStart > NOW()
+      </if>
+      <if test="query.actvityStatus == 'ONGOING'">
+        AND NOW() BETWEEN a.tmBuyStart AND a.tmBuyEnd
+      </if>
+      <if test="query.actvityStatus == 'END'">
+        AND NOW() > a.tmBuyEnd
+      </if>
+      <if test="query.status != null and query.status != '' ">
+        AND a.status = #{query.status}
+      </if>
+      <if test="query.productName != null and query.productName != '' ">
+        AND EXISTS (SELECT p.preproductId FROM t_activity_preproduct p WHERE a.activityId = p.activityId AND p.productName LIKE concat('%',#{query.productName},'%'))
+      </if>
+      <if test="query.sku != null and query.sku != '' ">
+        AND EXISTS (SELECT p.preproductId FROM t_activity_preproduct p WHERE a.activityId = p.activityId AND p.sku LIKE concat('%',#{query.sku},'%'))
+      </if>
+    </where>
+  </sql>
+
+  <select id="selectSpecialDayActivitys" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM t_activity
+    WHERE status = 'PASS'
+    AND (
+    (#{startTime} BETWEEN tmDisplayStart AND tmDisplayEnd)
+    OR (tmDisplayStart >= #{startTime} AND tmDisplayEnd &lt;= #{endTime})
+    OR (#{endTime} BETWEEN tmDisplayStart AND tmDisplayEnd)
+    )
+    <if test="areaShareParam != null">
+      <if test="areaShareParam == 0">
+        AND mod(areaId,2) = 0
+      </if>
+      <if test="areaShareParam == 1">
+        AND mod(areaId,2) != 0
+      </if>
+    </if>
+  </select>
+</mapper>

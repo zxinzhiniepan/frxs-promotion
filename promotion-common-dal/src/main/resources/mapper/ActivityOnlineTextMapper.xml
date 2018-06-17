@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frxs.promotion.common.dal.mapper.ActivityOnlineTextMapper">
+  <resultMap id="BaseResultMap" type="com.frxs.promotion.common.dal.entity.ActivityOnlineText">
+    <id column="textId" jdbcType="BIGINT" property="textId"/>
+    <result column="imgtextId" jdbcType="BIGINT" property="imgtextId"/>
+    <result column="textContent" jdbcType="VARCHAR" property="textContent"/>
+    <result column="thumbsupQty" jdbcType="INTEGER" property="thumbsupQty"/>
+    <result column="tmPublish" jdbcType="TIMESTAMP" property="tmPublish"/>
+    <result column="createUserId" jdbcType="BIGINT" property="createUserId"/>
+    <result column="createUserName" jdbcType="VARCHAR" property="createUserName"/>
+    <result column="modifyUserId" jdbcType="BIGINT" property="modifyUserId"/>
+    <result column="modifyUserName" jdbcType="VARCHAR" property="modifyUserName"/>
+    <result column="tmCreate" jdbcType="TIMESTAMP" property="tmCreate"/>
+    <result column="tmSmp" jdbcType="TIMESTAMP" property="tmSmp"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    textId, imgtextId, textContent, thumbsupQty, tmPublish, createUserId, createUserName, 
+    modifyUserId, modifyUserName, tmCreate, tmSmp
+  </sql>
+
+  <select id="selectByImgtextId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from t_activity_online_text where imgtextId = #{imgtextId} order by tmPublish desc
+  </select>
+
+  <update id="updateBatchThumbsupQty" parameterType="java.util.Map">
+    UPDATE t_activity_online_text
+    SET thumbsupQty = CASE
+    <foreach collection="map" index="key" item="value">
+      WHEN textId= #{key} THEN IFNULL(thumbsupQty,0) + #{value}
+    </foreach>
+    END
+    WHERE textId IN
+    <foreach collection="map" index="key" item="value" separator="," open="(" close=")">
+      #{key}
+    </foreach>
+  </update>
+</mapper>

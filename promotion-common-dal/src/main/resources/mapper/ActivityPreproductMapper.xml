@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ frxs Inc.  兴盛社区网络服务股份有限公司.
+  ~ Copyright (c) 2017-2018. All Rights Reserved.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frxs.promotion.common.dal.mapper.ActivityPreproductMapper">
+  <resultMap id="BaseResultMap" type="com.frxs.promotion.common.dal.entity.ActivityPreproduct">
+    <id column="preproductId" jdbcType="BIGINT" property="preproductId"/>
+    <result column="activityId" jdbcType="BIGINT" property="activityId"/>
+    <result column="productId" jdbcType="BIGINT" property="productId"/>
+    <result column="sku" jdbcType="VARCHAR" property="sku"/>
+    <result column="productName" jdbcType="VARCHAR" property="productName"/>
+    <result column="productTitle" jdbcType="VARCHAR" property="productTitle"/>
+    <result column="vendorId" jdbcType="BIGINT" property="vendorId"/>
+    <result column="vendorName" jdbcType="VARCHAR" property="vendorName"/>
+    <result column="vendorCode" jdbcType="VARCHAR" property="vendorCode"/>
+    <result column="yieldly" jdbcType="VARCHAR" property="yieldly"/>
+    <result column="specType" jdbcType="VARCHAR" property="specType"/>
+    <result column="brandName" jdbcType="VARCHAR" property="brandName"/>
+    <result column="packageQty" jdbcType="DECIMAL" property="packageQty"/>
+    <result column="saleLimitTime" jdbcType="DECIMAL" property="saleLimitTime"/>
+    <result column="saleLimitTimeUnit" jdbcType="VARCHAR" property="saleLimitTimeUnit"/>
+    <result column="barCodes" jdbcType="VARCHAR" property="barCodes"/>
+    <result column="sortSeq" jdbcType="INTEGER" property="sortSeq"/>
+    <result column="tmSort" jdbcType="TIMESTAMP" property="tmSort"/>
+    <result column="limitQty" jdbcType="DECIMAL" property="limitQty"/>
+    <result column="userLimitQty" jdbcType="DECIMAL" property="userLimitQty"/>
+    <result column="saleQty" jdbcType="DECIMAL" property="saleQty"/>
+    <result column="saleAmt" jdbcType="DECIMAL" property="saleAmt"/>
+    <result column="marketAmt" jdbcType="DECIMAL" property="marketAmt"/>
+    <result column="supplyAmt" jdbcType="DECIMAL" property="supplyAmt"/>
+    <result column="perServiceAmt" jdbcType="DECIMAL" property="perServiceAmt"/>
+    <result column="perCommission" jdbcType="DECIMAL" property="perCommission"/>
+    <result column="directMining" jdbcType="VARCHAR" property="directMining"/>
+    <result column="followQty" jdbcType="BIGINT" property="followQty"/>
+    <result column="primaryUrl" jdbcType="VARCHAR" property="primaryUrl"/>
+    <result column="createUserId" jdbcType="BIGINT" property="createUserId"/>
+    <result column="createUserName" jdbcType="VARCHAR" property="createUserName"/>
+    <result column="modifyUserId" jdbcType="BIGINT" property="modifyUserId"/>
+    <result column="modifyUserName" jdbcType="VARCHAR" property="modifyUserName"/>
+    <result column="tmCreate" jdbcType="TIMESTAMP" property="tmCreate"/>
+    <result column="tmSmp" jdbcType="TIMESTAMP" property="tmSmp"/>
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    preproductId, activityId, productId, sku, productName, productTitle, vendorId, vendorName, 
+    vendorCode, yieldly, specType,brandName, packageQty, saleLimitTime, saleLimitTimeUnit, barCodes,
+    sortSeq, tmSort, limitQty, userLimitQty, saleQty, saleAmt, marketAmt, supplyAmt, 
+    perServiceAmt, perCommission, directMining, followQty,primaryUrl,createUserId, createUserName,
+    modifyUserId, modifyUserName, tmCreate, tmSmp
+  </sql>
+
+  <select id="selectSpecialTimePreproducts" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT p.preproductId, p.activityId, p.productId, p.sku, p.productName, p.productTitle, p.vendorId, p.vendorName,
+    p.vendorCode, p.yieldly, p.specType, p.brandName, p.packageQty, p.saleLimitTime, p.saleLimitTimeUnit, p.barCodes,
+    p.sortSeq, p.tmSort, p.limitQty, p.userLimitQty, p.saleQty, p.saleAmt, p.marketAmt, p.supplyAmt,
+    p.perServiceAmt, p.perCommission, p.directMining, p.followQty,p.primaryUrl
+    FROM t_activity_preproduct p
+    WHERE EXISTS (SELECT a.activityId FROM t_activity a WHERE p.activityId = a.activityId
+    <if test="areaId != null">
+      AND a.areaId = #{areaId}
+    </if>
+    AND a.status = 'PASS' AND (
+    (#{startTime} BETWEEN tmDisplayStart AND tmDisplayEnd)
+    OR (tmDisplayStart >= #{startTime} AND tmDisplayEnd &lt;= #{endTime})
+    OR (#{endTime} BETWEEN tmDisplayStart AND tmDisplayEnd)
+    ))
+    <if test="vendorId != null">
+      AND p.vendorId = #{vendorId}
+    </if>
+    ORDER BY p.sortSeq ASC, p.tmSort DESC
+  </select>
+
+  <select id="selectDisplayingPreproducts" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT p.preproductId, p.activityId, p.productId, p.sku, p.productName, p.productTitle, p.vendorId, p.vendorName,
+    p.vendorCode, p.yieldly, p.specType, p.brandName, p.packageQty, p.saleLimitTime, p.saleLimitTimeUnit, p.barCodes,
+    p.sortSeq, p.tmSort, p.limitQty, p.userLimitQty, p.saleQty, p.saleAmt, p.marketAmt, p.supplyAmt,
+    p.perServiceAmt, p.perCommission, p.directMining, p.followQty,p.primaryUrl
+    FROM t_activity_preproduct p
+    WHERE EXISTS (SELECT a.activityId FROM t_activity a WHERE p.activityId = a.activityId
+    <if test="areaId != null">
+      AND a.areaId = #{areaId}
+    </if>
+    AND a.status = 'PASS' AND (NOW() BETWEEN tmDisplayStart AND tmDisplayEnd))
+    ORDER BY p.sortSeq ASC, p.tmSort DESC
+  </select>
+
+  <select id="findActivityPreproductByProductId" parameterType="Map" resultMap="BaseResultMap">
+    select
+    p.preproductId, p.activityId, p.productId, p.sku, p.productName, p.productTitle, p.vendorId, p.vendorName,
+    p.vendorCode, p.yieldly, p.specType, p.brandName, p.packageQty, p.saleLimitTime, p.saleLimitTimeUnit, p.barCodes,
+    p.sortSeq, p.tmSort, p.limitQty, p.userLimitQty, p.saleQty, p.saleAmt, p.marketAmt, p.supplyAmt,
+    p.perServiceAmt, p.perCommission, p.directMining, p.followQty,p.primaryUrl
+    from t_activity_preproduct p
+    WHERE EXISTS (SELECT a.activityId FROM t_activity a WHERE p.activityId = a.activityId AND a.areaId = #{areaId,jdbcType=BIGINT} AND a.status in('PASS','PENDING','REJECT') )
+    <choose>
+      <when test="productIds == null or productIds.size() == 0">
+        AND 1 != 1
+      </when>
+      <when test="productIds.size() == 1">
+        AND p.productId =
+        <foreach collection="productIds" item="id">#{id,jdbcType=BIGINT}</foreach>
+      </when>
+      <otherwise>
+        AND p.productId in
+        <foreach collection="productIds" item="id" open="(" separator="," close=")">
+          #{id,jdbcType=BIGINT}
+        </foreach>
+      </otherwise>
+    </choose>
+  </select>
+
+  <insert id="insertBatch" parameterType="java.util.List">
+    INSERT INTO t_activity_preproduct(
+    activityId, productId, sku, productName, productTitle, vendorId, vendorName,
+    vendorCode, yieldly, specType, brandName, packageQty, saleLimitTime, saleLimitTimeUnit, barCodes,
+    sortSeq, tmSort, limitQty, userLimitQty, saleQty, saleAmt, marketAmt, supplyAmt,
+    perServiceAmt, perCommission, directMining, followQty, primaryUrl,createUserId, createUserName, tmCreate
+    )VALUES
+    <foreach collection="list" item="item" separator=",">
+      (#{item.activityId}, #{item.productId}, #{item.sku}, #{item.productName}, #{item.productTitle}, #{item.vendorId}, #{item.vendorName},
+      #{item.vendorCode}, #{item.yieldly}, #{item.specType}, #{item.brandName},#{item.packageQty}, #{item.saleLimitTime}, #{item.saleLimitTimeUnit}, #{item.barCodes},
+      #{item.sortSeq}, #{item.tmSort}, #{item.limitQty}, #{item.userLimitQty}, #{item.saleQty}, #{item.saleAmt}, #{item.marketAmt}, #{item.supplyAmt},
+      #{item.perServiceAmt}, #{item.perCommission}, #{item.directMining}, #{item.followQty},#{item.primaryUrl}, #{item.createUserId}, #{item.createUserName},#{item.tmCreate}
+      )
+    </foreach>
+  </insert>
+
+  <select id="findActivityPreproductSortByConditions" parameterType="java.util.Map"
+    resultType="com.frxs.promotion.common.dal.entity.ActivityPreproductSort">
+    SELECT
+    a.activityId activityId,
+    a.preproductId preproductId,
+    a.productName productName,
+    a.sku sku,
+    a.specType specType,
+    a.packageQty packageQty,
+    a.vendorCode vendorCode,
+    a.vendorName vendorName,
+    a.sortSeq sortSeq,
+    a.saleAmt saleAmt,
+    a.marketAmt marketAmt,
+    a.perServiceAmt perServiceAmt,
+    a.perCommission perCommission,
+    a.supplyAmt supplyAmt
+    from t_activity_preproduct a
+    WHERE EXISTS (SELECT b.activityId FROM t_activity b WHERE a.activityId = b.activityId AND b.status != 'DELETED'
+    <if test="areaId != null and areaId != '' ">
+      AND b.areaId = #{areaId,jdbcType=BIGINT}
+    </if>
+    <if test="showStartTime != null and showEndTime !=null ">
+      AND (
+      (#{showStartTime} BETWEEN b.tmDisplayStart AND b.tmDisplayEnd)
+      OR (b.tmDisplayStart >= #{showStartTime} AND b.tmDisplayEnd &lt;= #{showEndTime})
+      OR (#{showEndTime} BETWEEN b.tmDisplayStart AND b.tmDisplayEnd)
+      )
+    </if>
+    <if test="activityStatus != null and activityStatus !='' ">
+      <if test="activityStatus == 0 ">
+        AND b.tmBuyStart &gt; now()
+      </if>
+      <if test="activityStatus == 1 ">
+        AND b.tmBuyStart &lt; now() and b.tmBuyEnd &gt; now()
+      </if>
+      <if test="activityStatus == 2 ">
+        AND b.tmBuyEnd &lt; now()
+      </if>
+    </if>
+    )
+    <if test="productName != null and productName != '' ">
+      AND a.productName like concat(concat('%',#{productName}),'%')
+    </if>
+    <if test="sku != null and sku != '' ">
+      AND a.sku like concat(concat('%',#{sku}),'%')
+    </if>
+    ORDER BY a.sortSeq ASC,a.tmSort DESC
+  </select>
+
+  <update id="updateActivityPreproductSort" parameterType="com.frxs.promotion.common.dal.entity.ActivityPreproduct" statementType="PREPARED">
+    UPDATE t_activity_preproduct a SET
+    a.`sortSeq` = #{sortSeq}
+    WHERE a.`preproductId` = #{preproductId,jdbcType=BIGINT}
+  </update>
+
+  <select id="selectPeriodPreproducts" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT p.preproductId, p.activityId, p.productId, p.sku, p.productName, p.productTitle, p.vendorId, p.vendorName,
+    p.vendorCode, p.yieldly, p.specType, p.brandName,p.packageQty, p.saleLimitTime, p.saleLimitTimeUnit, p.barCodes,
+    p.sortSeq, p.tmSort, p.limitQty, p.userLimitQty, p.saleQty, p.saleAmt, p.marketAmt, p.supplyAmt,
+    p.perServiceAmt, p.perCommission, p.directMining, p.followQty,p.primaryUrl
+    FROM t_activity_preproduct p
+    WHERE p.productId = #{productId}
+    AND EXISTS (SELECT a.activityId FROM t_activity a
+    WHERE p.activityId = a.activityId AND a.status != 'DELETED' AND
+    ((#{tmDisplayStart} BETWEEN a.tmDisplayStart AND a.tmDisplayEnd) OR (a.tmDisplayStart >= #{tmDisplayStart} AND a.tmDisplayEnd &lt;= #{tmDisplayEnd}) OR (#{tmDisplayEnd} BETWEEN a.tmDisplayStart AND a.tmDisplayEnd))
+    <if test="excludeActivityId != null">
+      AND a.activityId != #{excludeActivityId}
+    </if>
+    )
+  </select>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.frxs.promotion.common.dal.entity.ActivityPreproduct">
+    update t_activity_preproduct
+    <set>
+      <if test="activityId != null">
+        activityId = #{activityId,jdbcType=BIGINT},
+      </if>
+      <if test="productId != null">
+        productId = #{productId,jdbcType=BIGINT},
+      </if>
+      <if test="sku != null">
+        sku = #{sku,jdbcType=VARCHAR},
+      </if>
+      <if test="productName != null">
+        productName = #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="productTitle != null">
+        productTitle = #{productTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="vendorId != null">
+        vendorId = #{vendorId,jdbcType=BIGINT},
+      </if>
+      <if test="vendorName != null">
+        vendorName = #{vendorName,jdbcType=VARCHAR},
+      </if>
+      <if test="vendorCode != null">
+        vendorCode = #{vendorCode,jdbcType=VARCHAR},
+      </if>
+      <if test="yieldly != null">
+        yieldly = #{yieldly,jdbcType=VARCHAR},
+      </if>
+      <if test="specType != null">
+        specType = #{specType,jdbcType=VARCHAR},
+      </if>
+      <if test="packageQty != null">
+        packageQty = #{packageQty,jdbcType=DECIMAL},
+      </if>
+      <if test="saleLimitTime != null">
+        saleLimitTime = #{saleLimitTime,jdbcType=DECIMAL},
+      </if>
+      <if test="saleLimitTimeUnit != null">
+        saleLimitTimeUnit = #{saleLimitTimeUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="barCodes != null">
+        barCodes = #{barCodes,jdbcType=VARCHAR},
+      </if>
+      <if test="sortSeq != null">
+        sortSeq = #{sortSeq,jdbcType=INTEGER},
+      </if>
+      <if test="tmSort != null">
+        tmSort = #{tmSort,jdbcType=TIMESTAMP},
+      </if>
+      <if test="limitQty != null">
+        limitQty = #{limitQty,jdbcType=DECIMAL},
+      </if>
+      <if test="userLimitQty != null">
+        userLimitQty = #{userLimitQty,jdbcType=DECIMAL},
+      </if>
+      <if test="saleQty != null">
+        saleQty = #{saleQty,jdbcType=DECIMAL},
+      </if>
+      <if test="saleAmt != null">
+        saleAmt = #{saleAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="marketAmt != null">
+        marketAmt = #{marketAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="supplyAmt != null">
+        supplyAmt = #{supplyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="perServiceAmt != null">
+        perServiceAmt = #{perServiceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="perCommission != null">
+        perCommission = #{perCommission,jdbcType=DECIMAL},
+      </if>
+      <if test="directMining != null">
+        directMining = #{directMining,jdbcType=VARCHAR},
+      </if>
+      <if test="followQty != null">
+        followQty = #{followQty,jdbcType=BIGINT},
+      </if>
+      <if test="primaryUrl != null">
+        primaryUrl = #{primaryUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="createUserId != null">
+        createUserId = #{createUserId,jdbcType=BIGINT},
+      </if>
+      <if test="createUserName != null">
+        createUserName = #{createUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyUserId != null">
+        modifyUserId = #{modifyUserId,jdbcType=BIGINT},
+      </if>
+      <if test="modifyUserName != null">
+        modifyUserName = #{modifyUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="tmCreate != null">
+        tmCreate = #{tmCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tmSmp != null">
+        tmSmp = #{tmSmp,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where preproductId = #{preproductId,jdbcType=BIGINT}
+  </update>
+
+  <select id="selectProductInActivity" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT p.preproductId, p.activityId, p.productId, p.sku, p.productName, p.productTitle, p.vendorId, p.vendorName,
+    p.vendorCode, p.yieldly, p.specType, p.brandName, p.packageQty, p.saleLimitTime, p.saleLimitTimeUnit, p.barCodes,
+    p.sortSeq, p.tmSort, p.limitQty, p.userLimitQty, p.saleQty, p.saleAmt, p.marketAmt, p.supplyAmt,
+    p.perServiceAmt, p.perCommission, p.directMining, p.followQty,p.primaryUrl
+    FROM t_activity_preproduct p
+    WHERE EXISTS (SELECT a.activityId FROM t_activity a WHERE p.activityId = a.activityId AND a.status = 'PASS' AND NOW() &lt;= a.tmDisplayEnd)
+    <if test="productIds != null">
+      AND p.productId IN
+      <foreach collection="productIds" separator="," item="item" open="(" close=")">
+        #{item}
+      </foreach>
+    </if>
+  </select>
+
+  <update id="updateFollowQtyBatch" parameterType="java.util.List">
+    UPDATE t_activity_preproduct
+    SET followQty = CASE
+    <foreach collection="list" item="item">
+      WHEN productId = #{item.productId} AND activityId = #{item.activityId} THEN #{item.followQty}
+    </foreach>
+    END
+    WHERE
+    <foreach collection="list" item="item" separator="or" open="(" close=")">
+      activityId = #{item.activityId} AND productId = #{item.productId}
+    </foreach>
+  </update>
+
+  <update id="updateSaleQtyBatch" parameterType="java.util.List">
+    UPDATE t_activity_preproduct
+    SET saleQty = CASE
+    <foreach collection="list" item="item">
+      WHEN activityId = #{item.activityId} AND sku = #{item.sku} THEN #{item.saleQty}
+    </foreach>
+    END
+    WHERE
+    <foreach collection="list" item="item" separator="or" open="(" close=")">
+      activityId = #{item.activityId} AND sku = #{item.sku}
+    </foreach>
+  </update>
+
+  <select id="countPreproduct" parameterType="java.util.Map" resultType="java.lang.Integer">
+    SELECT COUNT(1)
+    FROM t_activity_preproduct p
+    <include refid="preproductPageWhere"/>
+  </select>
+
+  <select id="selectPreproductPage" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT p.preproductId, p.activityId, p.productId, p.sku, p.productName, p.productTitle, p.vendorId, p.vendorName,
+    p.vendorCode, p.yieldly, p.specType, p.brandName, p.packageQty, p.saleLimitTime, p.saleLimitTimeUnit, p.barCodes,
+    p.sortSeq, p.tmSort, p.limitQty, p.userLimitQty, p.saleQty, p.saleAmt, p.marketAmt, p.supplyAmt,
+    p.perServiceAmt, p.perCommission, p.directMining, p.followQty,p.primaryUrl
+    FROM t_activity_preproduct p
+    <include refid="preproductPageWhere"/>
+    ORDER BY p.tmSmp DESC
+    LIMIT #{offset},#{limit}
+  </select>
+
+  <sql id="preproductPageWhere">
+    <where>
+      EXISTS (SELECT a.activityId FROM t_activity a WHERE p.activityId = a.activityId AND a.status != 'DELETED'
+      <if test="query.tmBuyStart != null and query.tmBuyEnd == null">
+        AND (
+        (#{query.tmBuyStart} &lt;= a.tmBuyStart)
+        OR (#{query.tmBuyStart} BETWEEN a.tmBuyStart AND a.tmBuyEnd)
+        )
+      </if>
+      <if test="query.tmBuyEnd != null and query.tmBuyStart == null">
+        AND (
+        (a.tmBuyEnd &lt;= #{query.tmBuyEnd})
+        OR (#{query.tmBuyEnd} BETWEEN a.tmBuyStart AND a.tmBuyEnd)
+        )
+      </if>
+      <if test="query.tmBuyStart != null and query.tmBuyEnd != null">
+        AND (
+        (#{query.tmBuyStart} BETWEEN a.tmBuyStart AND a.tmBuyEnd)
+        OR (a.tmBuyStart >= #{query.tmBuyStart} AND a.tmBuyEnd &lt;= #{query.tmBuyEnd})
+        OR (#{query.tmBuyEnd} BETWEEN a.tmBuyStart AND a.tmBuyEnd)
+        )
+      </if>
+      <if test="query.activityName != null ">
+        AND a.activityName LIKE concat('%',#{query.activityName},'%')
+      </if>
+      <if test="query.actvityStatus == 'NOTSTARTED'">
+        AND NOW() &lt; a.tmBuyStart
+      </if>
+      <if test="query.actvityStatus == 'ONGOING'">
+        AND NOW() BETWEEN a.tmBuyStart AND a.tmBuyEnd
+      </if>
+      <if test="query.actvityStatus == 'END'">
+        AND NOW() > a.tmBuyEnd
+      </if>
+      <if test="query.status != null and query.status != '' ">
+        AND a.status = #{query.status}
+      </if>
+      <if test="query.areaId != null">
+        AND a.areaId = #{query.areaId}
+      </if>
+      )
+      <if test="query.vendorId != null">
+        AND p.vendorId = #{query.vendorId}
+      </if>
+      <if test="query.productName != null and query.productName != ''">
+        AND p.productName LIKE concat('%',#{query.productName},'%')
+      </if>
+      <if test="query.sku != null and query.sku != ''">
+        AND p.sku LIKE concat('%',#{query.sku},'%')
+      </if>
+    </where>
+  </sql>
+
+  <select id="selectVendorForSaleProduct" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    SELECT p.preproductId, p.activityId, p.productId, p.sku, p.productName, p.productTitle, p.vendorId, p.vendorName,
+    p.vendorCode, p.yieldly, p.specType, p.brandName, p.packageQty, p.saleLimitTime, p.saleLimitTimeUnit, p.barCodes,
+    p.sortSeq, p.tmSort, p.limitQty, p.userLimitQty, p.saleQty, p.saleAmt, p.marketAmt, p.supplyAmt,
+    p.perServiceAmt, p.perCommission, p.directMining, p.followQty,p.primaryUrl
+    FROM t_activity_preproduct p
+    WHERE EXISTS (SELECT a.activityId FROM t_activity a WHERE p.activityId = a.activityId
+    AND a.status = 'PASS' AND NOW() &lt;= tmDisplayEnd)
+    AND p.vendorId = #{vendorId}
+    ORDER BY p.sortSeq ASC, p.tmSort DESC
+  </select>
+
+  <select id="selectStoreLinePreproduct" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT p.preproductId, p.activityId, p.productId, p.sku, p.productName, p.productTitle, p.vendorId, p.vendorName,
+    p.vendorCode, p.yieldly, p.specType, p.brandName, p.packageQty, p.saleLimitTime, p.saleLimitTimeUnit, p.barCodes,
+    p.sortSeq, p.tmSort, p.limitQty, p.userLimitQty, p.saleQty, p.saleAmt, p.marketAmt, p.supplyAmt,
+    p.perServiceAmt, p.perCommission, p.directMining, p.followQty,p.primaryUrl
+    FROM t_activity_preproduct p
+    WHERE EXISTS (SELECT a.activityId FROM t_activity a WHERE p.activityId = a.activityId
+    AND  a.areaId = #{areaId} AND a.status != 'DELETED' AND DATE_FORMAT(a.tmPickUp,'%Y-%m-%d') = #{tmPickUp})
+  </select>
+</mapper>

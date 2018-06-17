@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:reg="http://www.dangdang.com/schema/ddframe/reg"
+  xmlns:job="http://www.dangdang.com/schema/ddframe/job"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.dangdang.com/schema/ddframe/reg
+                        http://www.dangdang.com/schema/ddframe/reg/reg.xsd
+                        http://www.dangdang.com/schema/ddframe/job
+                        http://www.dangdang.com/schema/ddframe/job/job.xsd">
+  <!--配置作业注册中心 -->
+  <reg:zookeeper id="promotionJobRegCentre" server-lists="${job.zk.address}" namespace="${job.zk.namespace}" base-sleep-time-milliseconds="1000" max-sleep-time-milliseconds="3000" max-retries="3"/>
+
+  <job:simple id="indexTomorrowDataToRedisJob" class="com.frxs.promotion.biz.event.job.IndexTomorrowDataToRedisJob" reconcile-interval-minutes="10" overwrite="true" registry-center-ref="promotionJobRegCentre"
+    cron="0 30 23 * * ?"
+    sharding-total-count="2" sharding-item-parameters="0=0,1=1" description="每天23:30(0 30 23 * * ?)将第二天所有待预售的所有商品同步到redis,分片一台处理区域为偶数，一台处理区域id为奇数"/>
+
+  <job:simple id="updateIndexRedisDataJob" class="com.frxs.promotion.biz.event.job.UpdateIndexRedisDataJob" reconcile-interval-minutes="10" overwrite="true" registry-center-ref="promotionJobRegCentre"
+    cron="0/5 * * * * ?"
+    sharding-total-count="2" sharding-item-parameters="0=0,1=1" description="每隔5秒(0/5 * * * * ?)更新当天redis的首页数据是否和数据库一致，分片一台处理区域为偶数，一台处理区域id为奇数"/>
+
+  <job:simple id="detailOlineImgtextToRedisJob" class="com.frxs.promotion.biz.event.job.DetailOlineImgtextToRedisJob" reconcile-interval-minutes="10" overwrite="true" registry-center-ref="promotionJobRegCentre"
+    cron="0/5 * * * * ?"
+    sharding-total-count="2" sharding-item-parameters="0=0,1=1" description="每隔5秒(0/5 * * * * ?)将当天预售商品的图文直播从数据库同步到redis,分片一台处理区域为偶数，一台处理区域id为奇数"/>
+
+  <job:simple id="detailThumbsupToRedisJob" class="com.frxs.promotion.biz.event.job.DetailThumbsupToRedisJob" reconcile-interval-minutes="10" overwrite="true" registry-center-ref="promotionJobRegCentre"
+    cron="0/5 * * * * ?"
+    sharding-total-count="2" sharding-item-parameters="0=0,1=1" description="每隔5秒(0/5 * * * * ?)将当天预售商品的图文直播点赞从数据库同步到redis,分片一台处理区域为偶数，一台处理区域id为奇数"/>
+
+  <job:simple id="clearToadyExpiredTradeProductQtyJob" class="com.frxs.promotion.biz.event.job.ClearToadyExpiredTradeProductQtyJob" reconcile-interval-minutes="10" overwrite="true"
+    registry-center-ref="promotionJobRegCentre" cron="0 30 1 * * ?"
+    sharding-total-count="2" sharding-item-parameters="0=0,1=1" description="每天1点30(0 30 1 * * ?)将过期的商品销量redis缓存清理,分片一台处理区域为偶数，一台处理区域id为奇数"/>
+</beans>

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ frxs Inc.  兴盛社区网络服务股份有限公司.
+  ~ Copyright (c) 2017-2018. All Rights Reserved.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frxs.promotion.common.dal.mapper.ActivityOnlineImgtextMapper">
+  <resultMap id="BaseResultMap" type="com.frxs.promotion.common.dal.entity.ActivityOnlineImgtext">
+    <id column="imgtextId" jdbcType="BIGINT" property="imgtextId"/>
+    <result column="activityId" jdbcType="BIGINT" property="activityId"/>
+    <result column="productId" jdbcType="BIGINT" property="productId"/>
+    <result column="vendorId" jdbcType="BIGINT" property="vendorId"/>
+    <result column="vendorCode" jdbcType="VARCHAR" property="vendorCode"/>
+    <result column="vendorName" jdbcType="VARCHAR" property="vendorName"/>
+    <result column="imgTextTitle" jdbcType="VARCHAR" property="imgTextTitle"/>
+    <result column="tmSubmit" jdbcType="TIMESTAMP" property="tmSubmit"/>
+    <result column="delStatus" jdbcType="VARCHAR" property="delStatus"/>
+    <result column="imgTextAuditStatus" jdbcType="VARCHAR" property="imgTextAuditStatus"/>
+    <result column="auditUserId" jdbcType="BIGINT" property="auditUserId"/>
+    <result column="auditUserName" jdbcType="VARCHAR" property="auditUserName"/>
+    <result column="tmAudit" jdbcType="TIMESTAMP" property="tmAudit"/>
+    <result column="totalThumbsupQty" jdbcType="INTEGER" property="totalThumbsupQty"/>
+    <result column="createUserId" jdbcType="BIGINT" property="createUserId"/>
+    <result column="createUserName" jdbcType="VARCHAR" property="createUserName"/>
+    <result column="modifyUserId" jdbcType="BIGINT" property="modifyUserId"/>
+    <result column="modifyUserName" jdbcType="VARCHAR" property="modifyUserName"/>
+    <result column="tmCreate" jdbcType="TIMESTAMP" property="tmCreate"/>
+    <result column="tmSmp" jdbcType="TIMESTAMP" property="tmSmp"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    imgtextId, activityId, productId, vendorId, vendorCode, vendorName,
+    imgTextTitle, tmSubmit, delStatus, imgTextAuditStatus, auditUserId, auditUserName, 
+    tmAudit, createUserId, createUserName, modifyUserId, modifyUserName, tmCreate, tmSmp
+  </sql>
+
+  <select id="findActivityOnlineImgtextManage" parameterType="java.util.Map"
+    resultType="com.frxs.promotion.common.dal.entity.ActivityOnlineImgtextManage">
+    SELECT
+    a.imgtextId imgtextId,
+    a.tmSubmit tmSubmit,
+    a.vendorCode vendorCode,
+    a.vendorName vendorName,
+    b.activityId activityId,
+    b.activityName activityName,
+    b.tmBuyStart tmBuyStart,
+    b.tmBuyEnd tmBuyEnd,
+    c.productName productName,
+    c.preproductId preproductId,
+    a.auditUserId auditUserId,
+    a.auditUserName auditUserName,
+    a.totalThumbsupQty totalThumbsupQty
+    from t_activity_online_imgtext a
+    <include refid="activityOnlineImgtextManageWhere"/>
+    ORDER BY a.tmSubmit DESC
+    LIMIT #{pageNo},#{pageSize}
+  </select>
+
+
+  <select id="countActivityOnlineImgtextManageList" parameterType="java.util.Map" resultType="java.lang.Integer">
+    SELECT COUNT(1) FROM t_activity_online_imgtext a
+    <include refid="activityOnlineImgtextManageWhere"/>
+  </select>
+
+  <sql id="activityOnlineImgtextManageWhere">
+    INNER JOIN t_activity b on a.activityId =b.activityId
+    INNER JOIN t_activity_preproduct c on a.productId = c.productId and a.activityId = c.activityId
+    WHERE a.delStatus = 'FALSE'
+    <if test="map.tmBuyStart != null and map.tmBuyEnd == null">
+      AND (
+      (#{map.tmBuyStart} &lt;= b.tmBuyStart)
+      OR (#{map.tmBuyStart} BETWEEN b.tmBuyStart AND b.tmBuyEnd)
+      )
+    </if>
+    <if test="map.tmBuyEnd != null and map.tmBuyStart == null">
+      AND (
+      (b.tmBuyEnd &lt;= #{map.tmBuyEnd})
+      OR (#{map.tmBuyEnd} BETWEEN b.tmBuyStart AND b.tmBuyEnd)
+      )
+    </if>
+    <if test="map.tmBuyStart != null and map.tmBuyEnd != null">
+      AND (
+      (#{map.tmBuyStart} BETWEEN b.tmBuyStart AND b.tmBuyEnd)
+      OR (b.tmBuyStart >= #{map.tmBuyStart} AND b.tmBuyEnd &lt;= #{map.tmBuyEnd})
+      OR (#{map.tmBuyEnd} BETWEEN b.tmBuyStart AND b.tmBuyEnd)
+      )
+    </if>
+    <if test="map.vendorCode != null and map.vendorCode != '' ">
+      AND a.vendorCode like concat(concat('%',#{map.vendorCode}),'%')
+    </if>
+    <if test="map.vendorName != null and map.vendorName != '' ">
+      AND a.vendorName like concat(concat('%',#{map.vendorName}),'%')
+    </if>
+    <if test="map.productName != null and map.productName != '' ">
+      AND c.productName like concat(concat('%',#{map.productName}),'%')
+    </if>
+    <if test="map.imgTextStatus == 'DISPLAY'">
+      AND NOW() &lt;= b.tmBuyEnd
+    </if>
+    <if test="map.imgTextStatus == 'EXPIRED'">
+      AND b.tmBuyEnd &lt; NOW()
+    </if>
+    <if test="map.tmSubmitStart != null">
+      AND a.tmSubmit &gt; #{map.tmSubmitStart}
+    </if>
+    <if test="map.tmSubmitEnd != null">
+      AND a.tmSubmit &lt; #{map.tmSubmitEnd}
+    </if>
+  </sql>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.frxs.promotion.common.dal.entity.ActivityOnlineImgtext">
+    update t_activity_online_imgtext
+    <set>
+      <if test="activityId != null">
+        activityId = #{activityId,jdbcType=BIGINT},
+      </if>
+      <if test="productId != null">
+        productId = #{productId,jdbcType=BIGINT},
+      </if>
+      <if test="vendorId != null">
+        vendorId = #{vendorId,jdbcType=BIGINT},
+      </if>
+      <if test="vendorCode != null">
+        vendorCode = #{vendorCode,jdbcType=VARCHAR},
+      </if>
+      <if test="vendorName != null">
+        vendorName = #{vendorName,jdbcType=VARCHAR},
+      </if>
+      <if test="imgTextTitle != null">
+        imgTextTitle = #{imgTextTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="tmSubmit != null">
+        tmSubmit = #{tmSubmit,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delStatus != null">
+        delStatus = #{delStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="imgTextAuditStatus != null">
+        imgTextAuditStatus = #{imgTextAuditStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="auditUserId != null">
+        auditUserId = #{auditUserId,jdbcType=BIGINT},
+      </if>
+      <if test="auditUserName != null">
+        auditUserName = #{auditUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="tmAudit != null">
+        tmAudit = #{tmAudit,jdbcType=TIMESTAMP},
+      </if>
+      <if test="totalThumbsupQty != null">
+        totalThumbsupQty = #{totalThumbsupQty,jdbcType=INTEGER},
+      </if>
+      <if test="createUserId != null">
+        createUserId = #{createUserId,jdbcType=BIGINT},
+      </if>
+      <if test="createUserName != null">
+        createUserName = #{createUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyUserId != null">
+        modifyUserId = #{modifyUserId,jdbcType=BIGINT},
+      </if>
+      <if test="modifyUserName != null">
+        modifyUserName = #{modifyUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="tmCreate != null">
+        tmCreate = #{tmCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tmSmp != null">
+        tmSmp = #{tmSmp,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where imgtextId = #{imgtextId,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateThumbsupQtyBatch" parameterType="java.util.Map">
+    UPDATE t_activity_online_imgtext
+    SET totalThumbsupQty = CASE
+    <foreach collection="map" index="key" item="value">
+      WHEN imgtextId = #{key} THEN #{value}
+    </foreach>
+    END
+    WHERE imgtextId IN
+    <foreach collection="map" index="key" item="value" separator="," open="(" close=")">
+      #{key}
+    </foreach>
+  </update>
+
+  <select id="countVendorImgtext" parameterType="java.util.Map" resultType="java.lang.Integer">
+    SELECT COUNT(1)
+    FROM t_activity_online_imgtext it
+    <include refid="vendorWhere"/>
+  </select>
+
+  <select id="selectVendorImgtextPage" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT it.imgtextId, it.activityId, it.productId, it.vendorId, it.vendorCode, it.vendorName,
+    it.imgTextTitle, it.tmSubmit, it.delStatus, it.imgTextAuditStatus, it.auditUserId, it.auditUserName,
+    it.tmAudit, it.createUserId, it.createUserName, it.modifyUserId, it.modifyUserName, it.tmCreate, it.tmSmp
+    FROM t_activity_online_imgtext it
+    <include refid="vendorWhere"/>
+    ORDER BY it.tmSubmit DESC
+    LIMIT #{offset},#{limit}
+  </select>
+
+  <sql id="vendorWhere">
+    <where>
+      it.delStatus = 'FALSE'
+      <if test="query.vendorId != null ">
+        AND  it.vendorId = #{query.vendorId}
+      </if>
+      <if test="query.imgTextStatus != null and query.imgTextStatus != '' ">
+        AND EXISTS (SELECT i.imgId FROM t_activity_online_img i WHERE it.imgtextId = i.imgtextId AND imgStatus = #{query.imgTextStatus})
+      </if>
+    </where>
+  </sql>
+</mapper>

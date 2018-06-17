@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration status="OFF" monitorInterval="600">
+
+  <!--日志级别：TRACE < DEBUG < INFO < WARN < ERROR < FATAL-->
+  <Properties>
+    <!-- 配置日志文件输出目录,此处为项目根目录下的logs文件夹 -->
+    <Property name="LOG_HOME">logs</Property>
+    <property name="FILE_NAME">promotion</property>
+    <Property name="ROCKETMQ_HOME">logs/rocketmq</Property>
+    <property name="patternLayout">%d{DEFAULT} %level{length=5} [%thread-%tid] Class=[%logger] %m%n</property>
+  </Properties>
+
+  <Appenders>
+    <Console name="CONSOLE" target="SYSTEM_OUT">
+      <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+      <PatternLayout pattern="${patternLayout}"/>
+    </Console>
+
+    <RollingRandomAccessFile name="FRXS-PROMOTION-APPENDER" fileName="${LOG_HOME}/${FILE_NAME}.log" filePattern="${LOG_HOME}/${FILE_NAME}-%d{yyyy-MM-dd}-%i.log">
+      <PatternLayout pattern="${patternLayout}"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1"/>
+        <SizeBasedTriggeringPolicy size="500MB"/>
+      </Policies>
+      <DefaultRolloverStrategy max="20"/>
+    </RollingRandomAccessFile>
+
+    <RollingFile name="RocketmqClientAppender" fileName="${ROCKETMQ_HOME}/rocketmq_client.log" filePattern="${ROCKETMQ_HOME}/rocketmq_client-%d{yyyy-MM-dd}-%i.log">
+      <PatternLayout pattern="%d{yyy-MM-dd HH\:mm\:ss,SSS} %p %c{1}(%L) - %m%n"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy/>
+        <SizeBasedTriggeringPolicy size="1 GB"/>
+      </Policies>
+      <DefaultRolloverStrategy max="10"/>
+    </RollingFile>
+
+    <!--配置异步写日志-->
+    <Async name="Async" shutdownTimeout="10000">
+      <Appender-Ref ref="CONSOLE"/>
+      <Appender-Ref ref="FRXS-PROMOTION-APPENDER"/>
+      <Appender-Ref ref="RocketmqClientAppender"/>
+    </Async>
+  </Appenders>
+
+  <Loggers>
+    <Logger name="com.alibaba.dubbo" level="warn" additivity="false">
+      <Appender-Ref ref="FRXS-PROMOTION-APPENDER"/>
+    </Logger>
+    <logger name="RocketmqClient" level="warn" additivity="false">
+      <Appender-Ref ref="RocketmqClientAppender"/>
+    </logger>
+    <logger name="RocketmqCommon" level="warn" additivity="false">
+      <Appender-Ref ref="RocketmqClientAppender"/>
+    </logger>
+    <logger name="RocketmqRemoting" level="warn" additivity="false">
+      <Appender-Ref ref="RocketmqClientAppender"/>
+    </logger>
+    <Root level="info">
+      <Appender-Ref ref="CONSOLE"/>
+      <Appender-Ref ref="FRXS-PROMOTION-APPENDER"/>
+      <Appender-Ref ref="RocketmqClientAppender"/>
+    </Root>
+  </Loggers>
+</Configuration>

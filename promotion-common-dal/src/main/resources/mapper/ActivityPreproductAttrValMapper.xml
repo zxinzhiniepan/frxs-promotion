@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ frxs Inc.  兴盛社区网络服务股份有限公司.
+  ~ Copyright (c) 2017-2018. All Rights Reserved.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frxs.promotion.common.dal.mapper.ActivityPreproductAttrValMapper">
+  <resultMap id="BaseResultMap" type="com.frxs.promotion.common.dal.entity.ActivityPreproductAttrVal">
+    <id column="preproductAttrValId" jdbcType="BIGINT" property="preproductAttrValId"/>
+    <result column="preproductId" jdbcType="BIGINT" property="preproductId"/>
+    <result column="attrId" jdbcType="BIGINT" property="attrId"/>
+    <result column="attrName" jdbcType="VARCHAR" property="attrName"/>
+    <result column="attrValId" jdbcType="BIGINT" property="attrValId"/>
+    <result column="attrVal" jdbcType="VARCHAR" property="attrVal"/>
+    <result column="attrLevel" jdbcType="INTEGER" property="attrLevel"/>
+    <result column="createUserId" jdbcType="BIGINT" property="createUserId"/>
+    <result column="createUserName" jdbcType="VARCHAR" property="createUserName"/>
+    <result column="tmCreate" jdbcType="TIMESTAMP" property="tmCreate"/>
+    <result column="tmSmp" jdbcType="TIMESTAMP" property="tmSmp"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    preproductAttrValId, preproductId, attrId, attrName, attrValId, attrVal, attrLevel, 
+    createUserId, createUserName, tmCreate, tmSmp
+  </sql>
+
+  <insert id="insertBatch" parameterType="java.util.List">
+    INSERT INTO t_activity_preproduct_attr_val(
+    preproductId, attrId, attrName, attrValId, attrVal, attrLevel,
+    createUserId, createUserName, tmCreate
+    )VALUES
+    <foreach collection="list" item="item" separator=",">
+      (#{item.preproductId}, #{item.attrId}, #{item.attrName}, #{item.attrValId}, #{item.attrVal}, #{item.attrLevel},
+      #{item.createUserId}, #{item.createUserName}, #{item.tmCreate})
+    </foreach>
+  </insert>
+</mapper>
